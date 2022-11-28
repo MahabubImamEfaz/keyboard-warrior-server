@@ -20,6 +20,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    const usersCollection = client.db("keyboard").collection("users");
     const categoryCollection = client.db("keyboard").collection("categories");
     const productCollection = client.db("keyboard").collection("products");
     const bookingsCollection = client.db("keyboard").collection("bookings");
@@ -46,6 +47,25 @@ async function run() {
       const booking = req.body;
       console.log(booking);
       const result = await bookingsCollection.insertOne(booking);
+      res.send(result);
+    });
+
+    app.get("/orders", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const orders = await bookingsCollection.find(query).toArray();
+      res.send(orders);
+    });
+
+    // app.post("/user", async (req, res) => {
+    //   const user = req.body;
+    //   console.log(user);
+    //   const result = await usersCollection.insertOne(user);
+    //   res.send(result);
+    // });
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
       res.send(result);
     });
   } finally {
