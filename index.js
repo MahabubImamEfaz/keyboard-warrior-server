@@ -10,8 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 const { Await } = require("react-router-dom");
-const uri =
-  "mongodb+srv://keyboardUser:o1j1SIPHZFUaj0Wn@cluster0.cj7utkb.mongodb.net/?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.cj7utkb.mongodb.net/?retryWrites=true&w=majority`;
+
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -22,7 +22,9 @@ async function run() {
   try {
     const categoryCollection = client.db("keyboard").collection("categories");
     const productCollection = client.db("keyboard").collection("products");
+    const bookingsCollection = client.db("keyboard").collection("bookings");
 
+    //display category on home page
     app.get("/displaycategories", async (req, res) => {
       const query = {};
       const cursor = categoryCollection.find(query);
@@ -37,6 +39,13 @@ async function run() {
       }
 
       const result = await productCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.post("/booking", async (req, res) => {
+      const booking = req.body;
+      console.log(booking);
+      const result = await bookingsCollection.insertOne(booking);
       res.send(result);
     });
   } finally {
